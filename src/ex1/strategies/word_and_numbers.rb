@@ -1,10 +1,6 @@
-require_relative 'decryptor'
-
 module Ex1
-  class WordDecryptor < Ex1::Decryptor
-    protected
-
-    def remove_letters(line)
+  class WordAndNumbers
+    def execute(line)
       results = []
       buffer = ''
 
@@ -82,10 +78,6 @@ module Ex1
 
     def numbers_ending_with(text)
       NUMBERS.keys.filter { |k| k.end_with?(text) }
-    end
-
-    def forward_scan(result, letter)
-
     end
   end
 end

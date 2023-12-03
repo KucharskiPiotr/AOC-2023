@@ -1,6 +1,8 @@
 require_relative '../infra/input_reader'
-require_relative './decryptor'
-require_relative './word_decryptor'
+require_relative './domain/decryptor'
+require_relative './strategies/only_numbers'
+require_relative './strategies/word_and_numbers'
+require_relative './commands/command'
 
 module Ex1
   class Facade
@@ -9,25 +11,15 @@ module Ex1
     end
   end
 
-  class PartOneCommand
-    attr_accessor :input_lines
-
-    def initialize(input_lines)
-      @input_lines = input_lines
-      @decryptor = Ex1::Decryptor.new
-    end
-
-    def handle
-      @input_lines
-        .map { |line| @decryptor.parse(line) }
-        .reduce(:+)
+  class PartOneCommand < Command
+    protected def strategy
+      Ex1::OnlyNumbers.new
     end
   end
 
-  class PartTwoCommand < PartOneCommand
-    def initialize(input_lines)
-      super(input_lines)
-      @decryptor = Ex1::WordDecryptor.new
+  class PartTwoCommand < Command
+    protected def strategy
+      Ex1::WordAndNumbers.new
     end
   end
 end
