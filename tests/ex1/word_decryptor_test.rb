@@ -17,6 +17,7 @@ module Ex1
       assert_equal(42, @decryptor.parse('4nineeightseven2'))
       assert_equal(14, @decryptor.parse('zoneight234'))
       assert_equal(76, @decryptor.parse('7pqrstsixteen'))
+      assert_equal(48, @decryptor.parse('four7four92lfqkmgponeightbf'))
     end
   end
 end
