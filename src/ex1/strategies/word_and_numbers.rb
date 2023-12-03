@@ -2,60 +2,11 @@ module Ex1
   class WordAndNumbers
     def execute(line)
       results = []
-      buffer = ''
 
-      # First go from left, then from right
-      line.split('').each do |letter|
-        if letter.match? /[0-9]/
-          buffer = ''
-          results << letter.to_i
-          break
-        end
+      results << forward_scan(line)
+      results << backward_scan(line)
 
-        buffer += letter
-        possible_numbers = numbers_starting_with(buffer)
-
-        if possible_numbers.size == 1 && buffer == possible_numbers[0]
-          results << NUMBERS[buffer]
-          buffer = ''
-          break
-        end
-
-        if possible_numbers.size == 0
-          while possible_numbers.size == 0 && buffer.size > 0
-            buffer = buffer[1..]
-            possible_numbers = numbers_starting_with(buffer)
-          end
-          next
-        end
-      end
-
-      line.reverse.split('').each do |letter|
-        if letter.match? /[0-9]/
-          buffer = ''
-          results << letter.to_i
-          break
-        end
-
-        buffer += letter
-        possible_numbers = numbers_ending_with(buffer.reverse)
-
-        if possible_numbers.size == 1 && buffer.reverse == possible_numbers[0]
-          results << NUMBERS[buffer.reverse]
-          buffer = ''
-          break
-        end
-
-        if possible_numbers.size == 0
-          while possible_numbers.size == 0 && buffer.size > 0
-            buffer = buffer[1..]
-            possible_numbers = numbers_ending_with(buffer.reverse)
-          end
-          next
-        end
-      end
-
-      results
+      results.compact
     end
 
     private
@@ -71,6 +22,83 @@ module Ex1
       'eight' => 8,
       'nine' => 9,
     }
+
+    def forward_scan(line)
+      buffer = ''
+
+      line.split('').each do |letter|
+        number = detect_number(letter)
+        return number unless number.nil?
+
+        buffer += letter
+        result = detect_word_forward(buffer)
+
+        return result if result.is_a? Integer
+        buffer = result if result.is_a? String
+      end
+
+      nil
+    end
+
+    def backward_scan(line)
+      buffer = ''
+
+      line.reverse.split('').each do |letter|
+        number = detect_number(letter)
+        return number unless number.nil?
+
+        buffer += letter
+        result = detect_word_backwards(buffer.reverse)
+
+        return result if result.is_a? Integer
+        buffer = result.reverse if result.is_a? String
+      end
+
+      nil
+    end
+
+    def detect_number(letter)
+      return letter.to_i if letter.match? /[0-9]/
+      nil
+    end
+
+    def detect_word_forward(buffer)
+      possible_numbers = numbers_starting_with(buffer)
+
+      if possible_numbers.size == 1 && buffer == possible_numbers[0]
+        return NUMBERS[buffer]
+      end
+
+      if possible_numbers.size == 0
+        while possible_numbers.size == 0 && buffer.size > 0
+          buffer = buffer[1..]
+          possible_numbers = numbers_starting_with(buffer)
+        end
+
+        return buffer
+      end
+
+      nil
+    end
+
+    def detect_word_backwards(buffer)
+      possible_numbers = numbers_ending_with(buffer)
+
+      if possible_numbers.size == 1 && buffer == possible_numbers[0]
+        return NUMBERS[buffer]
+      end
+
+      if possible_numbers.size == 0
+        while possible_numbers.size == 0 && buffer.size > 0
+          buffer = buffer[0..-2]
+          possible_numbers = numbers_ending_with(buffer)
+        end
+
+        return buffer
+      end
+
+      nil
+    end
 
     def numbers_starting_with(text)
       NUMBERS.keys.filter { |k| k.start_with?(text) }
